@@ -6,12 +6,12 @@ using log4net.Core;
 
 namespace PrimitiveLogger
 {
-    public sealed class PrimitiveLogger : IDisposable
+    public sealed class Logger : IDisposable
     {
         #region Private Static
         private const string MessageFormat = "{0} - Source file: {1}, Member: {2}, Line No.: {3}";
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static Lazy<PrimitiveLogger> _instance = new Lazy<PrimitiveLogger>();
+        private static Lazy<Logger> _instance = new Lazy<Logger>();
         private static string _sourceFile;
         private static string _memberName;
         private static int _lineNumber;
@@ -36,7 +36,7 @@ namespace PrimitiveLogger
         /// <summary>
         /// Default Ctor, Lazy requires parameterless Ctor
         /// </summary>
-        public PrimitiveLogger()
+        public Logger()
         {
 
         }
@@ -44,13 +44,13 @@ namespace PrimitiveLogger
 
         #region Singleton (Lazy for Thread-safe)
         /// <summary>
-        /// Static instance of PrimitiveLogger. (this is used "inline")
+        /// Static instance of Logger. (this is used "inline")
         /// </summary>
         /// <param name="sourceFile">the sourcefile will be put here</param>
         /// <param name="memberName">the member that called the log will be put here</param>
         /// <param name="lineNumber">the source code line number will be put here</param>
-        /// <returns>the PrimitiveLogger instance (threadsafe)</returns>
-        public static PrimitiveLogger Instance([CallerFilePath] string sourceFile = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
+        /// <returns>the Logger instance (threadsafe)</returns>
+        public static Logger Instance([CallerFilePath] string sourceFile = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
         {
             _sourceFile = sourceFile;
             _memberName = memberName;
@@ -216,7 +216,7 @@ namespace PrimitiveLogger
         }
 
         // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~PrimitiveLogger() {
+        // ~Logger() {
         //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         //   Dispose(false);
         // }
