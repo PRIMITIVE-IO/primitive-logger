@@ -9,7 +9,7 @@ namespace PrimitiveLogger
     public sealed class Logger : IDisposable
     {
         #region Private Static
-        private const string MessageFormat = "{0} - Source file: {1}, Member: {2}, Line No.: {3}";
+        private const string MessageFormat = "{0} - Class: {1}, Line: {2}";
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Lazy<Logger> _instance = new Lazy<Logger>();
         private static string _sourceFile;
@@ -73,7 +73,7 @@ namespace PrimitiveLogger
             var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _sourceFile, _memberName, _lineNumber),
+                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
                 Exception = ex,
                 LogLevel = Level.Debug
             };
@@ -92,7 +92,7 @@ namespace PrimitiveLogger
             var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _sourceFile, _memberName, _lineNumber),
+                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
                 Exception = ex,
                 LogLevel = Level.Info
             };
@@ -111,7 +111,7 @@ namespace PrimitiveLogger
             var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _sourceFile, _memberName, _lineNumber),
+                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
                 Exception = ex,
                 LogLevel = Level.Warn
             };
@@ -130,7 +130,7 @@ namespace PrimitiveLogger
             var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _sourceFile, _memberName, _lineNumber),
+                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
                 Exception = ex,
                 LogLevel = Level.Error
             };
@@ -149,7 +149,7 @@ namespace PrimitiveLogger
             var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _sourceFile, _memberName, _lineNumber),
+                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
                 Exception = ex,
                 LogLevel = Level.Warn
             };
