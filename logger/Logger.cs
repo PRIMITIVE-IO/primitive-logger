@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using log4net.Core;
@@ -9,11 +10,11 @@ namespace PrimitiveLogger
     public sealed class Logger : IDisposable
     {
         #region Private Static
-        private const string MessageFormat = "{0} - Class: {1}, Line: {2}";
+        private const string MessageFormat = "{0} - File: {1}, Method: {2}, Line: {3}";
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static Lazy<Logger> _instance = new Lazy<Logger>();
         private static string _sourceFile;
-        private static string _memberName;
+        private static string _methodName;
         private static int _lineNumber;
         #endregion
 
@@ -47,13 +48,13 @@ namespace PrimitiveLogger
         /// Static instance of Logger. (this is used "inline")
         /// </summary>
         /// <param name="sourceFile">the sourcefile will be put here</param>
-        /// <param name="memberName">the member that called the log will be put here</param>
+        /// <param name="methodName">the member that called the log will be put here</param>
         /// <param name="lineNumber">the source code line number will be put here</param>
         /// <returns>the Logger instance (threadsafe)</returns>
-        public static Logger Instance([CallerFilePath] string sourceFile = "", [CallerMemberName] string memberName = "", [CallerLineNumber] int lineNumber = 0)
+        public static Logger Instance([CallerFilePath] string sourceFile = "", [CallerMemberName] string methodName = "", [CallerLineNumber] int lineNumber = 0)
         {
             _sourceFile = sourceFile;
-            _memberName = memberName;
+            _methodName = methodName;
             _lineNumber = lineNumber;
 
             return _instance.Value;
@@ -65,17 +66,19 @@ namespace PrimitiveLogger
         /// <summary>
         /// Log a debug message
         /// </summary>
-        /// <param name="messageFormat">the message format</param>
+        /// <param name="message">message</param>
         /// <param name="ex">the logging exception (optional)</param>
         /// <param name="formatArgs">the formatting objects (optional)</param>
-        public void Debug(string messageFormat, Exception ex = null, params object[] formatArgs)
+        public void Debug(string message, Exception ex = null, params object[] formatArgs)
         {
-            var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
+                Message = string.Format(message, formatArgs),
                 Exception = ex,
-                LogLevel = Level.Debug
+                LogLevel = Level.Debug,
+                MethodName = _methodName,
+                FilePath = _sourceFile,
+                LineNumber = _lineNumber
             };
 
             LogSpooler.AddItem(logEntry);
@@ -84,17 +87,19 @@ namespace PrimitiveLogger
         /// <summary>
         /// Log an Info message
         /// </summary>
-        /// <param name="messageFormat">the message format</param>
+        /// <param name="message">message</param>
         /// <param name="ex">the logging exception (optional)</param>
         /// <param name="formatArgs">the formatting objects (optional)</param>
-        public void Info(string messageFormat, Exception ex = null, params object[] formatArgs)
+        public void Info(string message, Exception ex = null, params object[] formatArgs)
         {
-            var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
+                Message = string.Format(message, formatArgs),
                 Exception = ex,
-                LogLevel = Level.Info
+                LogLevel = Level.Info,
+                MethodName = _methodName,
+                FilePath = _sourceFile,
+                LineNumber = _lineNumber
             };
 
             LogSpooler.AddItem(logEntry);
@@ -103,17 +108,19 @@ namespace PrimitiveLogger
         /// <summary>
         /// Log a Warn message
         /// </summary>
-        /// <param name="messageFormat">the message format</param>
+        /// <param name="message">message</param>
         /// <param name="ex">the logging exception (optional)</param>
         /// <param name="formatArgs">the formatting objects (optional)</param>
-        public void Warn(string messageFormat, Exception ex = null, params object[] formatArgs)
+        public void Warn(string message, Exception ex = null, params object[] formatArgs)
         {
-            var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
+                Message = string.Format(message, formatArgs),
                 Exception = ex,
-                LogLevel = Level.Warn
+                LogLevel = Level.Warn,
+                MethodName = _methodName,
+                FilePath = _sourceFile,
+                LineNumber = _lineNumber
             };
 
             LogSpooler.AddItem(logEntry);
@@ -122,17 +129,19 @@ namespace PrimitiveLogger
         /// <summary>
         /// Log an Error message
         /// </summary>
-        /// <param name="messageFormat">the message format</param>
+        /// <param name="message">message</param>
         /// <param name="ex">the logging exception (optional)</param>
         /// <param name="formatArgs">the formatting objects (optional)</param>
-        public void Error(string messageFormat, Exception ex = null, params object[] formatArgs)
+        public void Error(string message, Exception ex = null, params object[] formatArgs)
         {
-            var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
+                Message = string.Format(message, formatArgs),
                 Exception = ex,
-                LogLevel = Level.Error
+                LogLevel = Level.Error,
+                MethodName = _methodName,
+                FilePath = _sourceFile,
+                LineNumber = _lineNumber
             };
 
             LogSpooler.AddItem(logEntry);
@@ -141,17 +150,19 @@ namespace PrimitiveLogger
         /// <summary>
         /// Log a Fatal message
         /// </summary>
-        /// <param name="messageFormat">the message format</param>
+        /// <param name="message">message</param>
         /// <param name="ex">the logging exception (optional)</param>
         /// <param name="formatArgs">the formatting objects (optional)</param>
-        public void Fatal(string messageFormat, Exception ex = null, params object[] formatArgs)
+        public void Fatal(string message, Exception ex = null, params object[] formatArgs)
         {
-            var message = string.Format(messageFormat, formatArgs);
             LogEntry logEntry = new LogEntry()
             {
-                Message = string.Format(MessageFormat, message, _memberName, _lineNumber),
+                Message = string.Format(message, formatArgs),
                 Exception = ex,
-                LogLevel = Level.Warn
+                LogLevel = Level.Warn,
+                MethodName = _methodName,
+                FilePath = _sourceFile,
+                LineNumber = _lineNumber
             };
 
             LogSpooler.AddItem(logEntry);
@@ -161,25 +172,28 @@ namespace PrimitiveLogger
         #region Privates
         private void SendToLog4Net(LogEntry logEntry)
         {
+            string message = string.Format(MessageFormat, logEntry.Message, Path.GetFileName(logEntry.FilePath),
+                logEntry.MethodName, _lineNumber);
+
             if (logEntry.LogLevel == Level.Debug)
             {
-                log.Debug(logEntry.Message, logEntry.Exception);
+                log.Debug(message, logEntry.Exception);
             }
             else if (logEntry.LogLevel == Level.Info)
             {
-                log.Info(logEntry.Message, logEntry.Exception);
+                log.Info(message, logEntry.Exception);
             }
             else if (logEntry.LogLevel == Level.Warn)
             {
-                log.Warn(logEntry.Message, logEntry.Exception);
+                log.Warn(message, logEntry.Exception);
             }
             else if (logEntry.LogLevel == Level.Error)
             {
-                log.Error(logEntry.Message, logEntry.Exception);
+                log.Error(message, logEntry.Exception);
             }
             else if (logEntry.LogLevel == Level.Fatal)
             {
-                log.Fatal(logEntry.Message, logEntry.Exception);
+                log.Fatal(message, logEntry.Exception);
             }
         }
         #endregion
@@ -190,6 +204,9 @@ namespace PrimitiveLogger
             public Level LogLevel { get; set; }
             public string Message { get; set; }
             public Exception Exception { get; set; }
+            public string FilePath { get; set; }
+            public int LineNumber { get; set; }
+            public string MethodName { get; set; }
         }
 
         #region IDisposable Support
