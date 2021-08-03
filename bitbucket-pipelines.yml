@@ -24,7 +24,6 @@ pipelines:
           - dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
           - dotnet nuget push -s $SERVER_URL -k $API_KEY logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg
           
-  tags:
    "ext-v-*.*.*":
     - step:
         caches:
