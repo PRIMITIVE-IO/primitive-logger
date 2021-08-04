@@ -16,6 +16,11 @@ namespace PrimitiveLogger
         private static string _sourceFile;
         private static string _methodName;
         private static int _lineNumber;
+
+        private Action<string> _infoHandler;
+        private Action<string> _warningHandler;
+        private Action<object> _errorHandler;
+
         #endregion
 
         #region Private Fields
@@ -71,6 +76,8 @@ namespace PrimitiveLogger
         /// <param name="formatArgs">the formatting objects (optional)</param>
         public void Debug(string message, Exception ex = null, params object[] formatArgs)
         {
+            _infoHandler?.Invoke(message);
+
             LogEntry logEntry = new LogEntry()
             {
                 Message = string.Format(message, formatArgs),
@@ -92,6 +99,8 @@ namespace PrimitiveLogger
         /// <param name="formatArgs">the formatting objects (optional)</param>
         public void Info(string message, Exception ex = null, params object[] formatArgs)
         {
+            _infoHandler?.Invoke(message);
+
             LogEntry logEntry = new LogEntry()
             {
                 Message = string.Format(message, formatArgs),
@@ -113,6 +122,8 @@ namespace PrimitiveLogger
         /// <param name="formatArgs">the formatting objects (optional)</param>
         public void Warn(string message, Exception ex = null, params object[] formatArgs)
         {
+            _warningHandler?.Invoke(message);
+
             LogEntry logEntry = new LogEntry()
             {
                 Message = string.Format(message, formatArgs),
@@ -134,6 +145,8 @@ namespace PrimitiveLogger
         /// <param name="formatArgs">the formatting objects (optional)</param>
         public void Error(string message, Exception ex = null, params object[] formatArgs)
         {
+            _errorHandler?.Invoke($"{message} : {ex}");
+
             LogEntry logEntry = new LogEntry()
             {
                 Message = string.Format(message, formatArgs),
@@ -155,6 +168,8 @@ namespace PrimitiveLogger
         /// <param name="formatArgs">the formatting objects (optional)</param>
         public void Fatal(string message, Exception ex = null, params object[] formatArgs)
         {
+            _errorHandler?.Invoke($"{message} : {ex}");
+
             LogEntry logEntry = new LogEntry()
             {
                 Message = string.Format(message, formatArgs),
@@ -207,6 +222,13 @@ namespace PrimitiveLogger
             public string FilePath { get; set; }
             public int LineNumber { get; set; }
             public string MethodName { get; set; }
+        }
+
+        public void SetUnityLogHandlers(Action<string> infoHandler, Action<string> warnHandler, Action<object> errorHandler)
+        {
+            _infoHandler = infoHandler;
+            _warningHandler = warnHandler;
+            _errorHandler = errorHandler;
         }
 
         #region IDisposable Support
