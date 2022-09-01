@@ -1,38 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
+using JetBrains.Annotations;
 using log4net.Core;
 
 namespace PrimitiveLogger
 {
+    [PublicAPI]
     public sealed class Logger : IDisposable
     {
         #region Private Static
-        private const string MessageFormat = "{0} - File: {1}, Method: {2}, Line: {3}";
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private static Lazy<Logger> _instance = new Lazy<Logger>();
-        private static string _sourceFile;
-        private static string _methodName;
-        private static int _lineNumber;
 
-        private Action<string> _infoHandler;
-        private Action<string> _warningHandler;
-        private Action<object> _errorHandler;
+        const string MessageFormat = "{0} - File: {1}, Method: {2}, Line: {3}";
+        static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        static Lazy<Logger> _instance = new Lazy<Logger>();
+        static string _sourceFile;
+        static string _methodName;
+        static int _lineNumber;
+
+        Action<string> _infoHandler;
+        Action<string> _warningHandler;
+        Action<object> _errorHandler;
 
         #endregion
 
         #region Private Fields
-        private GenericSpooler<LogEntry> _logSpooler;
+
+        GenericSpooler<LogEntry> _logSpooler;
         #endregion
 
         #region Properties
-        private GenericSpooler<LogEntry> LogSpooler
+
+        GenericSpooler<LogEntry> LogSpooler
         {
             get
             {
-                _logSpooler = _logSpooler ?? new GenericSpooler<LogEntry>(SendToLog4Net);
+                _logSpooler ??= new GenericSpooler<LogEntry>(SendToLog4Net);
                 return _logSpooler;
             }
         }
@@ -185,7 +188,8 @@ namespace PrimitiveLogger
         #endregion
 
         #region Privates
-        private void SendToLog4Net(LogEntry logEntry)
+
+        void SendToLog4Net(LogEntry logEntry)
         {
             string message = string.Format(MessageFormat, logEntry.Message, Path.GetFileName(logEntry.FilePath),
                 logEntry.MethodName, _lineNumber);
@@ -214,7 +218,8 @@ namespace PrimitiveLogger
         #endregion
 
         #region Inner Classes
-        private class LogEntry
+
+        class LogEntry
         {
             public Level LogLevel { get; set; }
             public string Message { get; set; }
@@ -232,7 +237,8 @@ namespace PrimitiveLogger
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+
+        bool disposedValue = false; // To detect redundant calls
 
         void Dispose(bool disposing)
         {

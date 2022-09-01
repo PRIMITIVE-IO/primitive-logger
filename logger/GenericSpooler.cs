@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace PrimitiveLogger
 {
@@ -19,6 +19,7 @@ namespace PrimitiveLogger
     /// item.
     /// </remarks>
     /// <typeparam name="T">The Type of object to provide spooling for</typeparam>
+    [PublicAPI]
     public class GenericSpooler<T> : IGenericSpooler<T>
     {
         #region Class Scope Members
@@ -60,13 +61,8 @@ namespace PrimitiveLogger
         /// <summary>
         /// True if there are Currently more items in the queue
         /// </summary>
-        public bool HasMore
-        {
-            get
-            {
-                return _inputs.Count > 0;
-            }
-        }
+        public bool HasMore => _inputs.Any();
+
         #endregion
 
         #region Delegates and Events
@@ -89,7 +85,7 @@ namespace PrimitiveLogger
         /// <summary>
         /// The delegate to use for the callback
         /// </summary>
-        private readonly Action<T> _spoolerAction;
+        readonly Action<T> _spoolerAction;
         #endregion
 
         #region Ctors and Dtors
@@ -99,13 +95,8 @@ namespace PrimitiveLogger
         /// <param name="spoolerAction">the delegate to receive each item from the spool</param>
         public GenericSpooler(Action<T> spoolerAction)
         {
-            if (spoolerAction == null)
-            {
-                throw new NullReferenceException("Spooler Action cannot be null");
-            }
-
             _inputs = new ConcurrentQueue<ItemMetaData>();
-            _spoolerAction = spoolerAction;
+            _spoolerAction = spoolerAction ?? throw new NullReferenceException("Spooler Action cannot be null");
 
             _trafficEvent = new AutoResetEvent(false);
             _exitEvent = new AutoResetEvent(false);
@@ -161,8 +152,7 @@ namespace PrimitiveLogger
             {
                 _itemActionEvent.Reset();
 
-                ItemMetaData ignoredData;
-                while (_inputs.TryDequeue(out ignoredData))
+                while (_inputs.TryDequeue(out ItemMetaData ignoredData))
                 {
                     // do nothing; just clear the queue
                 }
@@ -235,7 +225,7 @@ namespace PrimitiveLogger
         /// <summary>
         /// Starts the thread that spools the items off the queue (if not yet started)
         /// </summary>
-        private void StartProcess()
+        void StartProcess()
         {
             if (_processWorkerThread == null)
             {
@@ -247,7 +237,7 @@ namespace PrimitiveLogger
         /// <summary>
         /// The method the thread executes.  The thread executes the Callback delegate for each item it takes off the queue.
         /// </summary>
-        private void ProcessWhileHasInput()
+        void ProcessWhileHasInput()
         {
             try
             {
@@ -258,8 +248,7 @@ namespace PrimitiveLogger
 
                     if (_operationHandles[iWaitEvent] == _trafficEvent)
                     {
-                        ItemMetaData itemData;
-                        while (_inputs.TryDequeue(out itemData))
+                        while (_inputs.TryDequeue(out ItemMetaData itemData))
                         {
                             // allow stop/resume using itemActionEvent signaling
                             if (_itemActionEvent.WaitOne())
@@ -279,10 +268,7 @@ namespace PrimitiveLogger
                         }
 
                         var spoolerEvent = SpoolerEmpty;
-                        if (spoolerEvent != null)
-                        {
-                            spoolerEvent();
-                        }
+                        spoolerEvent?.Invoke();
                     }
                     else if (_operationHandles[iWaitEvent] == _exitEvent)
                     {
@@ -303,12 +289,9 @@ namespace PrimitiveLogger
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="ex"></param>
-        private void NotifyException(object sender, Exception ex)
+        void NotifyException(object sender, Exception ex)
         {
-            if (ExceptionEncountered != null)
-            {
-                ExceptionEncountered(sender, ex);
-            }
+            ExceptionEncountered?.Invoke(sender, ex);
         }
 
         #endregion
@@ -318,7 +301,7 @@ namespace PrimitiveLogger
         /// Dispose implementation to type of disposing
         /// </summary>
         /// <param name="disposing">True for deterministic, false for finalization</param>
-        private void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (_isDisposed) return;
 
@@ -340,8 +323,7 @@ namespace PrimitiveLogger
                 FinalizeDispose();
 
                 // if the worker thread is still running on finalize, abort it!
-                if (_processWorkerThread != null)
-                    _processWorkerThread.Abort();
+                _processWorkerThread?.Abort();
 
                 _processWorkerThread = null;
             }
@@ -360,7 +342,8 @@ namespace PrimitiveLogger
         #endregion
 
         #region Inner classes
-        private class ItemMetaData
+
+        class ItemMetaData
         {
             /// <summary>
             /// If true spooler stops after this item
