@@ -22,7 +22,7 @@ pipelines:
           - xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION_NUMBER logger/$SOLUTION_NAME.csproj
           - dotnet restore logger/$SOLUTION_NAME.sln
           - dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
-          - dotnet nuget push -s https://ba-nuget.primitive.io/v3/index.json -k $API_KEY logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg
+          - dotnet nuget push -s https://ba-nuget.primitive.io -k $API_KEY logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg
           
    "ext-v-*.*.*":
     - step:
@@ -35,4 +35,4 @@ pipelines:
           - xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION_NUMBER extensions/PrimitiveLoggerExtensions/PrimitiveLoggerExtensions.Command/$EXT_PROJ_NAME.csproj
           - dotnet restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln
           - dotnet build --no-restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln --configuration $CONFIGURATION
-          - dotnet nuget push -s https://ba-nuget.primitive.io/v3/index.json -k $API_KEY extensions/PrimitiveLoggerExtensions/PrimitiveLoggerExtensions.Command/bin/$CONFIGURATION/$EXT_PROJ_NAME.$VERSION_NUMBER.nupkg
+          - dotnet nuget push -s https://ba-nuget.primitive.io -k $API_KEY extensions/PrimitiveLoggerExtensions/PrimitiveLoggerExtensions.Command/bin/$CONFIGURATION/$EXT_PROJ_NAME.$VERSION_NUMBER.nupkg
