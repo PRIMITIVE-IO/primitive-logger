@@ -23,7 +23,15 @@ pipelines:
           - dotnet restore logger/$SOLUTION_NAME.sln
           - dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
           - dotnet nuget push -s https://ba-nuget.primitive.io -k $API_KEY logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg
-          
+    - step:
+        name: Publish to NPM
+        image: node:12.20.2
+        script:
+          - export VERSION=${BITBUCKET_TAG/v-/}
+          - npm version $VERSION --force
+          - pipe: atlassian/npm-publish:0.2.0
+            variables:
+              NPM_TOKEN: $NPM_TOKEN
    "ext-v-*.*.*":
     - step:
         caches:
