@@ -1,5 +1,5 @@
 {
-    "name": "@primitive-io/io.primitive.logger",
+    "name": "io.primitive.primitive_logger",
     "version": "0.0.0",
     "displayName": "Primitive Logger",
     "description": "Primitive Logger",
@@ -7,10 +7,6 @@
     "unityRelease": "0b12",
     "documentationUrl": "https://primitive.io/",
     "licensesUrl": "https://primitive.io/legal",
-    "dependencies": {
-      "JetBrains.Annotations": "2022.1.0",
-      "log4net": "2.0.15"
-    },
     "author": {
       "name": "Primitive IO",
       "email": "john@primitive.io",
