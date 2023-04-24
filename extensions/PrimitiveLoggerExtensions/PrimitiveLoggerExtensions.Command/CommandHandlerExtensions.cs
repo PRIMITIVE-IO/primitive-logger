@@ -2,12 +2,14 @@
 using System.CommandLine;
 using System.IO;
 using System.Reflection;
+using JetBrains.Annotations;
 using log4net;
 using log4net.Config;
 using log4net.Repository;
 
 namespace PrimitiveLoggerExtensions.Command
 {
+    [PublicAPI]
     public static class CommandHandlerExtensions
     {
         public static void InvokeWithPrimitiveLogger(this RootCommand command, string[] args)
