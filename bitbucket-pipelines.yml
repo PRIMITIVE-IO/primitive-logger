@@ -7,9 +7,7 @@ pipelines:
             - dotnetcore
           script:
           - dotnet restore logger/$SOLUTION_NAME.sln
-          - dotnet restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln
           - dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
-          - dotnet build --no-restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln --configuration $CONFIGURATION
   tags:
    "v-*.*.*":
     - step:
@@ -32,15 +30,3 @@ pipelines:
           - pipe: atlassian/npm-publish:0.2.0
             variables:
               NPM_TOKEN: $NPM_TOKEN
-   "ext-v-*.*.*":
-    - step:
-        caches:
-          - dotnetcore
-        script: 
-          - export VERSION_NUMBER=${BITBUCKET_TAG/ext-v-/}
-          - apt-get update -y
-          - apt-get install -y xmlstarlet
-          - xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION_NUMBER extensions/PrimitiveLoggerExtensions/PrimitiveLoggerExtensions.Command/$EXT_PROJ_NAME.csproj
-          - dotnet restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln
-          - dotnet build --no-restore extensions/PrimitiveLoggerExtensions/$SOLUTION_NAME2.sln --configuration $CONFIGURATION
-          - dotnet nuget push -s https://ba-nuget.primitive.io -k $API_KEY extensions/PrimitiveLoggerExtensions/PrimitiveLoggerExtensions.Command/bin/$CONFIGURATION/$EXT_PROJ_NAME.$VERSION_NUMBER.nupkg

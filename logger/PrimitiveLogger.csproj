@@ -2,23 +2,22 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <Authors>Primitive.io team</Authors>
     <Company>Primitive.io</Company>
     <Product />
-    <TargetFramework>net7.0</TargetFramework>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0-eap2" />
     <PackageReference Include="log4net" Version="2.0.15" />
-    <None Include="docs\README.md" Pack="true" PackagePath="\"/>
+    <None Include="docs\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-
 
 </Project>
