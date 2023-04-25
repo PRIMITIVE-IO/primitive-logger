@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.3.1</Version>
+    <Version>0.3.2</Version>
     <Authors>Primitive.io team</Authors>
     <Company>Primitive.io</Company>
     <Product />
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
