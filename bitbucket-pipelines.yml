@@ -20,4 +20,4 @@ pipelines:
           - xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION_NUMBER logger/$SOLUTION_NAME.csproj
           - dotnet restore logger/$SOLUTION_NAME.sln
           - dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
-          - dotnet nuget push --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg
+          - dotnet nuget push logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION_NUMBER.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
