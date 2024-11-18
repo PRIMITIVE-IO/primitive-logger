@@ -1,0 +1,59 @@
+on:
+  push:
+    tags:
+      - "v-[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ github.ref_name }}
+      SOLUTION_NAME: ${{ vars.SOLUTION_NAME }}
+      CONFIGURATION: ${{ vars.CONFIGURATION }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.x'
+      
+      - name: Set version number for build process
+        run: echo "VERSION=$(echo $VERSION | sed -e 's/v-//gI')" >> $GITHUB_ENV
+
+      - name: Debug Version
+        run: |
+          echo "Parsed version: $VERSION"
+
+      - name: Update and install xmlstarlet
+        run: sudo apt-get update -y && sudo apt-get install -y xmlstarlet
+
+      - name: Update version number in csproj
+        run: xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION logger/$SOLUTION_NAME.csproj
+
+      - name: Restore SLN
+        run: dotnet restore $SOLUTION_NAME.sln
+
+      - name: Build
+        run: dotnet build --no-restore $SOLUTION_NAME.sln --configuration $CONFIGURATION
+
+      - name: Push to NuGet
+        run: dotnet nuget push logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
+        env:
+          NUGET_KEY: ${{ secrets.NUGET_KEY }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            Automatic release for version ${{ github.ref_name }}.
+            - Add changelog here.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
