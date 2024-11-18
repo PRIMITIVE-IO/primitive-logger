@@ -35,10 +35,10 @@ jobs:
         run: xmlstarlet ed --inplace -u "//Project//PropertyGroup/Version" -v $VERSION logger/$SOLUTION_NAME.csproj
 
       - name: Restore SLN
-        run: dotnet restore $SOLUTION_NAME.sln
+        run: dotnet restore logger/$SOLUTION_NAME.sln
 
       - name: Build
-        run: dotnet build --no-restore $SOLUTION_NAME.sln --configuration $CONFIGURATION
+        run: dotnet build --no-restore logger/$SOLUTION_NAME.sln --configuration $CONFIGURATION
 
       - name: Push to NuGet
         run: dotnet nuget push logger/bin/$CONFIGURATION/$SOLUTION_NAME.$VERSION.nupkg --source https://api.nuget.org/v3/index.json --api-key $NUGET_KEY
