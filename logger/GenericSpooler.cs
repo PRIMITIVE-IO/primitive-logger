@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace PrimitiveLogger
 {
@@ -19,7 +18,6 @@ namespace PrimitiveLogger
     /// item.
     /// </remarks>
     /// <typeparam name="T">The Type of object to provide spooling for</typeparam>
-    [PublicAPI]
     public class GenericSpooler<T> : IGenericSpooler<T>
     {
         #region Class Scope Members

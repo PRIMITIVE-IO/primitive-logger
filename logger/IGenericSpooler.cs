@@ -1,9 +1,7 @@
 ﻿using System;
-using JetBrains.Annotations;
 
 namespace PrimitiveLogger
 {
-    [PublicAPI]
     public interface IGenericSpooler<T> : IDisposable
     {
         /// <summary>

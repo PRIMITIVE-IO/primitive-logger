@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
 using log4net.Core;
 
 namespace PrimitiveLogger
 {
-    [PublicAPI]
     public sealed class Logger : IDisposable
     {
         #region Private Static
